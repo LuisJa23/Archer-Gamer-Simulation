@@ -1,0 +1,312 @@
+fileFormatVersion: 2
+guid: fd24eabd540123749ac1dedec0282c55
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 6389790121533867865
+    second: Cacodaemon Sprite Sheet_0
+  - first:
+      213: -3852113458823382303
+    second: Cacodaemon Sprite Sheet_1
+  - first:
+      213: -7517396926043841675
+    second: Cacodaemon Sprite Sheet_2
+  - first:
+      213: -5837719191672891323
+    second: Cacodaemon Sprite Sheet_3
+  - first:
+      213: 3256740997420468133
+    second: Cacodaemon Sprite Sheet_4
+  - first:
+      213: 4402805786130018716
+    second: Cacodaemon Sprite Sheet_5
+  - first:
+      213: -3445638416284038088
+    second: Cacodaemon Sprite Sheet_6
+  - first:
+      213: 7407922803484994528
+    second: Cacodaemon Sprite Sheet_7
+  - first:
+      213: -2092530981859022121
+    second: Cacodaemon Sprite Sheet_8
+  - first:
+      213: 5764096388217608220
+    second: Cacodaemon Sprite Sheet_9
+  - first:
+      213: 7112838895952259862
+    second: Cacodaemon Sprite Sheet_10
+  - first:
+      213: -6949584599233666273
+    second: Cacodaemon Sprite Sheet_11
+  - first:
+      213: -5138439382098170774
+    second: Cacodaemon Sprite Sheet_12
+  - first:
+      213: -1376189586554993406
+    second: Cacodaemon Sprite Sheet_13
+  - first:
+      213: -8916707295786921608
+    second: Cacodaemon Sprite Sheet_14
+  - first:
+      213: -6242054799334906656
+    second: Cacodaemon Sprite Sheet_15
+  - first:
+      213: -4180759591894971638
+    second: Cacodaemon Sprite Sheet_16
+  - first:
+      213: 2459692808887900460
+    second: Cacodaemon Sprite Sheet_17
+  - first:
+      213: -1874386889993243614
+    second: Cacodaemon Sprite Sheet_18
+  - first:
+      213: -3471362277137582445
+    second: Cacodaemon Sprite Sheet_19
+  - first:
+      213: 4296365076730665381
+    second: Cacodaemon Sprite Sheet_20
+  - first:
+      213: -4008731628196936064
+    second: Cacodaemon Sprite Sheet_21
+  - first:
+      213: 7733959977076908501
+    second: Cacodaemon Sprite Sheet_22
+  - first:
+      213: 2866245267187518156
+    second: Cacodaemon Sprite Sheet_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Stop Demonio_5
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 9
+        width: 46
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65945e816c5af5a4495c0ced506793e9
+      internalID: 265925945
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stop Demonio_6
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 9
+        width: 46
+        height: 39
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f5f6bf69f7471c145a7f51d80e6eded3
+      internalID: 873571493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stop Demonio_7
+      rect:
+        serializedVersion: 2
+        x: 269
+        y: 8
+        width: 46
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce4bb51efd7285742988c4f1b756968b
+      internalID: -1498647766
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Stop Demonio_8
+      rect:
+        serializedVersion: 2
+        x: 331
+        y: 4
+        width: 45
+        height: 37
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfa8ab51ac2dad84b89f86355816f5e3
+      internalID: -677602359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 4355656b9f9a5a2439ac73032207f1ba
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Cacodaemon Sprite Sheet_0: 6389790121533867865
+      Cacodaemon Sprite Sheet_1: -3852113458823382303
+      Cacodaemon Sprite Sheet_10: 7112838895952259862
+      Cacodaemon Sprite Sheet_11: -6949584599233666273
+      Cacodaemon Sprite Sheet_12: -5138439382098170774
+      Cacodaemon Sprite Sheet_13: 1185720293
+      Cacodaemon Sprite Sheet_14: 1382852283
+      Cacodaemon Sprite Sheet_15: 1944572568
+      Cacodaemon Sprite Sheet_16: -678657362
+      Cacodaemon Sprite Sheet_17: -214859273
+      Cacodaemon Sprite Sheet_18: 140801601
+      Cacodaemon Sprite Sheet_19: 976402228
+      Cacodaemon Sprite Sheet_2: -7517396926043841675
+      Cacodaemon Sprite Sheet_20: 1799061757
+      Cacodaemon Sprite Sheet_21: -1894145624
+      Cacodaemon Sprite Sheet_22: 430016985
+      Cacodaemon Sprite Sheet_23: -1539849922
+      Cacodaemon Sprite Sheet_3: -5837719191672891323
+      Cacodaemon Sprite Sheet_4: 3256740997420468133
+      Cacodaemon Sprite Sheet_5: 4402805786130018716
+      Cacodaemon Sprite Sheet_6: -3445638416284038088
+      Cacodaemon Sprite Sheet_7: 7407922803484994528
+      Cacodaemon Sprite Sheet_8: -2092530981859022121
+      Cacodaemon Sprite Sheet_9: 5764096388217608220
+      Stop Demonio_0: -2125653861
+      Stop Demonio_1: 1691840613
+      Stop Demonio_10: 170596724
+      Stop Demonio_2: -222513542
+      Stop Demonio_3: 461188275
+      Stop Demonio_4: -2146670638
+      Stop Demonio_5: 265925945
+      Stop Demonio_6: 873571493
+      Stop Demonio_7: -1498647766
+      Stop Demonio_8: -677602359
+      Stop Demonio_9: 1010485616
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
