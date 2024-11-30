@@ -1,22 +1,30 @@
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class DemonBehavior : MonoBehaviour
 {
     public Transform player; 
     public float detectionDistance = 10f; // Distancia máxima para detectar al jugador
-    public float chaseSpeed = 0.5f; // Velocidad del demonio al perseguir
+    public float chaseSpeed = 0.7f; // Velocidad del demonio al perseguir
     public int health = 1; // Vida del demonio
+    public GameObject heartPrefab; // Prefab del corazón (OneHeart)
+    public GameObject speedBoostPrefab; // Prefab para el aumento de velocidad
 
-    private bool isStopped;
+    private Animator animator;
+    private Rigidbody2D rb2D;
 
-    private Animator Animator;
-    private Rigidbody2D Rigidbody2D;
+    private RandomNumberValidator randomNumberValidator = new RandomNumberValidator();
+
+    private int score = 10; 
+
+    private int currentState = 0; // Estado inicial: 0 (no generar ítem)
+   
 
     void Start()
     {
-        Rigidbody2D = GetComponent<Rigidbody2D>();
-        Rigidbody2D.gravityScale = 0;
-        Animator = GetComponent<Animator>();
+        rb2D = GetComponent<Rigidbody2D>();
+        rb2D.gravityScale = 0;
+        animator = GetComponent<Animator>();
 
         if (player == null)
         {
@@ -26,56 +34,125 @@ public class DemonBehavior : MonoBehaviour
 
     void Update()
     {
-        Vector3 directionToDemon = transform.position - player.position;
-        float distanceToPlayer = directionToDemon.magnitude;
+        Vector3 directionToPlayer = player.position - transform.position;
+        float distanceToPlayer = directionToPlayer.magnitude;
 
-        // Verifica si el jugador está dentro del rango de detección
         if (distanceToPlayer <= detectionDistance)
         {
-            // Determina si el jugador está mirando en la dirección del demonio
-            bool playerLookingAtDemon = (player.localScale.x > 0 && transform.position.x > player.position.x) ||
-                                         (player.localScale.x < 0 && transform.position.x < player.position.x);
+            animator.SetBool("isStopped", false);
+            Vector3 directionToMove = directionToPlayer.normalized;
 
-            if (!playerLookingAtDemon)
+            if (directionToMove.x > 0)
             {
-                Animator.SetBool("isStopped", false);
-                Vector3 directionToPlayer = (player.position - transform.position).normalized;
-
-                // Cambia la dirección del demonio según el movimiento
-                if (directionToPlayer.x > 0)
-                {
-                    transform.localScale = new Vector3(2f, 2f, 2); // Mirando a la derecha
-                }
-                else if (directionToPlayer.x < 0)
-                {
-                    transform.localScale = new Vector3(-2f, 2f, 2); // Mirando a la izquierda
-                }
-
-                transform.Translate(directionToPlayer * chaseSpeed * Time.deltaTime, Space.World);
+                transform.localScale = new Vector3(2f, 2f, 2); // Mirando a la derecha
             }
-            else
+            else if (directionToMove.x < 0)
             {
-                Animator.SetBool("isStopped", true);
+                transform.localScale = new Vector3(-2f, 2f, 2); // Mirando a la izquierda
             }
-            // Si el jugador está mirando al demonio, el demonio se queda quieto
+
+            transform.Translate(directionToMove * chaseSpeed * Time.deltaTime, Space.World);
+        }
+        else
+        {
+            animator.SetBool("isStopped", true); // Se detiene si está fuera del rango
         }
     }
 
     public void TakeDamage()
     {
-        health--; // Resta 1 vida al demonio
+        health--;
         Debug.Log("Demon took damage. Remaining health: " + health);
 
         if (health <= 0)
         {
-            Disappear(); // Si no tiene vida, desaparece
+            Disappear();
         }
     }
 
     private void Disappear()
     {
-        // Aquí puedes agregar un efecto de desaparición si lo deseas
-        gameObject.SetActive(false); // Desactiva el objeto demonio
+        ScoreText.scoreValue += score;
+        DropItem(); 
+        gameObject.SetActive(false); 
+        player.GetComponent<Arquero>().OnDemonKilled();
         Debug.Log("Demon has disappeared.");
+    }
+
+    private void DropItem()
+    {
+        // Determinar el próximo estado utilizando la cadena de Markov
+        currentState = GetNextState(currentState);
+
+        switch (currentState)
+        {
+            case 1:
+                SpawnHeart();
+                break;
+            case 2:
+                SpawnSpeedBoost();
+                break;
+            default:
+                Debug.Log("No se generó ningún ítem.");
+                break;
+        }
+    }
+
+    private int GetNextState(int currentState)
+{
+    // Generar un nuevo número aleatorio cada vez que se llame al método
+    float random = (float)randomNumberValidator.GetNextRandom(); 
+    
+
+    // Lógica de transición entre estados basada en el valor del número aleatorio
+    if (currentState == 0) // Estado: Sin generar ítem
+    {
+        if (random < 0.3f) return 2; // 30% a corazón
+        else if (random < 0.6f) return 1; // 30% a velocidad
+        else return 0; // 40% se queda igual
+    }
+    else if (currentState == 1) // Estado: Corazón
+    {
+        if (random < 0.2f) return 1; // 20% a corazón
+        else if (random < 0.4f) return 2; // 20% a velocidad
+        else return 0; // 60% a sin generar
+    }
+    else if (currentState == 2) // Estado: Velocidad
+    {
+        if (random < 0.2f) return 1; // 20% a corazón
+        else if (random < 0.4f) return 2; // 20% a velocidad
+        else return 0; // 60% a sin generar
+    }
+
+    return 0; // Por defecto, no generar nada
+}
+
+
+    private void SpawnHeart()
+    {
+        if (heartPrefab != null)
+        {
+            Instantiate(heartPrefab, transform.position, Quaternion.identity);
+            Debug.Log("¡El demonio ha dejado caer un Corazón!");
+        }
+        else
+        {
+            Debug.LogWarning("Prefab de Corazón no asignado!");
+        }
+
+        
+    }
+
+    private void SpawnSpeedBoost()
+    {
+        if (speedBoostPrefab != null)
+        {
+            Instantiate(speedBoostPrefab, transform.position, Quaternion.identity);
+            Debug.Log("¡El demonio ha dejado caer un Aumento de Velocidad!");
+        }
+        else
+        {
+            Debug.LogWarning("Prefab de Aumento de Velocidad no asignado!");
+        }
     }
 }

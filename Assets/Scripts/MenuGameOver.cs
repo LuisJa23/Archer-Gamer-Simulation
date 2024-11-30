@@ -1,22 +1,25 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using UnityEngine.Audio;
 
 public class MenuGameOver : MonoBehaviour
 
 {
     [SerializeField] private GameObject gameOverMenu;
+    public AudioSource audioSource;
     private Arquero archer;
 
     private void Start()
     {
-        archer = FindObjectOfType<Arquero>();
+        archer = FindFirstObjectByType<Arquero>();
         archer.OnPlayerDeath += ArcherOnPlayerDeath;
     }
 
     private void ArcherOnPlayerDeath(object sender, EventArgs e)
     {
         gameOverMenu.SetActive(true);
+        audioSource.Play();
     }
 
 

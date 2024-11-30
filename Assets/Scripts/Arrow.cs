@@ -1,10 +1,12 @@
 using UnityEngine;
 
+
 public class Arrow : MonoBehaviour
 {
 
     private Rigidbody2D Rigidbody2D;
     private Vector3 Movement;  
+    
     
 
     public float Speed;
@@ -12,6 +14,7 @@ public class Arrow : MonoBehaviour
     void Start()
     {
         Rigidbody2D = GetComponent<Rigidbody2D>();
+       
 
     }  
 
@@ -47,6 +50,11 @@ public class Arrow : MonoBehaviour
         {
             // Llama al método de daño en el demonio
             collision.gameObject.GetComponent<DemonBehavior>().TakeDamage();
+            Destroy(gameObject); // Destruye la flecha al impactar
+        }
+
+        else if(collision.gameObject.CompareTag("Item") || collision.gameObject.CompareTag("Speed")) // Verifica si colisiona con el slime
+        {
             Destroy(gameObject); // Destruye la flecha al impactar
         }
     }

@@ -7,11 +7,16 @@ TagManager:
   - Wall
   - Demon
   - Enemy
+  - Undefined
+  - Arrow
+  - Slime
+  - Item
+  - Speed
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Wall
   - Water
   - UI
   - Enemy

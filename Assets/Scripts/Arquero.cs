@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.Audio;
+
 public class Arquero : MonoBehaviour
 {
     public GameObject ArrowPrefab;
     public float Speed;
     private Rigidbody2D Rigidbody2D;
-    private Vector3 Movement;
 
     private float Horizontal;
     private float Vertical;
@@ -14,13 +15,25 @@ public class Arquero : MonoBehaviour
     private Animator Animator;
 
     private float LastShot;
-    private int vida = 6;
+    private int vida = 6; // Vida inicial
     private bool isImmune = false;
-
+    private bool isSpeedBoosted = false;
 
     public UIManager uiManager;
 
     public event EventHandler OnPlayerDeath;
+
+    private SpriteRenderer spriteRenderer;
+    private Color baseColor;
+
+    public AudioSource audioSource;
+    public AudioSource powerUpSound;
+    
+    public AudioSource damageSound;
+    public AudioSource killSound;
+
+    private float timeSinceLastDemonKill = 0f; // Tiempo desde el último Demon eliminado
+
 
     void Start()
     {
@@ -28,8 +41,9 @@ public class Arquero : MonoBehaviour
         Rigidbody2D.gravityScale = 0;
         Animator = GetComponent<Animator>();
 
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        baseColor = spriteRenderer.color;
 
-        // Verifica que el objeto "Game_Manager_UI" existe en la escena
         uiManager = GameObject.Find("GameManagerUI").GetComponent<UIManager>();
 
         if (uiManager != null)
@@ -37,6 +51,8 @@ public class Arquero : MonoBehaviour
             uiManager.UpdateLives(vida);
         }
 
+        // Iniciar la corrutina para verificar daño por inactividad
+        StartCoroutine(CheckNoKillPenalty());
     }
 
     void Update()
@@ -68,21 +84,12 @@ public class Arquero : MonoBehaviour
         {
             Animator.SetBool("isShooting", false);
         }
-
-
     }
 
     private void Shot()
     {
-        Vector3 movement;
-        if (transform.localScale.x > 0) // Si el arquero está mirando a la derecha
-        {
-            movement = Vector3.right;
-        }
-        else // Si el arquero está mirando a la izquierda
-        {
-            movement = Vector3.left;
-        }
+        audioSource.Play();
+        Vector3 movement = transform.localScale.x > 0 ? Vector3.right : Vector3.left;
 
         GameObject arrow = Instantiate(ArrowPrefab, transform.position + movement * 0.3f + new Vector3(0, 0.1f, 0), Quaternion.identity);
         arrow.GetComponent<Arrow>().setMovement(movement);
@@ -97,45 +104,121 @@ public class Arquero : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Demon") && !isImmune)
         {
-            StartCoroutine(TakeDamage());
-            vida--;
-            uiManager.UpdateLives(vida);
-            GetComponent<SpriteRenderer>().color = Color.red;
-
-
+            StartCoroutine(ApplyEnemyDamage());
+            OnDemonKilled(); // Reiniciar el tiempo al matar un Demon
         }
 
+        if (collision.gameObject.CompareTag("Slime") && !isImmune)
+        {
+            StartCoroutine(ApplyEnemyDamage());
+        }
 
+        if (collision.gameObject.CompareTag("Item"))
+        {
+            AddLife(2); // Incrementa la vida en 2
+            Destroy(collision.gameObject); // Destruye el objeto del ítem
+        }
+
+        if (collision.gameObject.CompareTag("Speed") && !isSpeedBoosted)
+        {
+            Destroy(collision.gameObject); // Destruye el objeto Speed
+            StartCoroutine(ApplySpeedBoost());
+        }
     }
 
-
-
-    private IEnumerator TakeDamage()
+    private IEnumerator ApplySpeedBoost()
     {
+        powerUpSound.Play();
+        isSpeedBoosted = true;
+        float originalSpeed = Speed;
+        Speed *= 2; // Duplica la velocidad
+        Debug.Log("Velocidad aumentada temporalmente.");
 
+        float elapsedTime = 0f;
 
-        if (vida <= 1)
+        while (elapsedTime < 7f) // Aumenta la velocidad por 7 segundos
+        {
+            UpdateSpriteColor(isImmune ? Color.red : Color.yellow);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // Restaurar la velocidad y el color original
+        Speed = originalSpeed;
+        isSpeedBoosted = false;
+        UpdateSpriteColor(isImmune ? Color.red : baseColor);
+        Debug.Log("El aumento de velocidad ha terminado.");
+    }
+
+    public IEnumerator ApplyEnemyDamage()
+    {
+        if (vida > 1)
+        {
+            damageSound.Play();
+            vida--;
+            uiManager.UpdateLives(vida);
+            Debug.Log("Daño recibido. Vida actual: " + vida);
+
+            isImmune = true; // Activar inmunidad temporal
+            UpdateSpriteColor(Color.red);
+
+            yield return new WaitForSeconds(1); // Inmunidad por 1 segundo
+
+            isImmune = false; // Desactivar inmunidad
+            UpdateSpriteColor(isSpeedBoosted ? Color.yellow : baseColor);
+        }
+        else
         {
             Disappear();
             OnPlayerDeath?.Invoke(this, EventArgs.Empty);
         }
-        else
-        {
-            isImmune = true; // Activar inmunidad
-            yield return new WaitForSeconds(1); // Esperar 1 segundo
-            isImmune = false; // Desactivar inmunidad
-            GetComponent<SpriteRenderer>().color = Color.white;
-        }
+    }
+
+    private void UpdateSpriteColor(Color color)
+    {
+        spriteRenderer.color = color;
     }
 
     private void Disappear()
-    {
-        // Aquí puedes agregar un efecto de desaparición si lo deseas
-        gameObject.SetActive(false); // Desactiva el objeto arquero
-        Debug.Log("Arquero has disappeared.");
-    }
-
-
-
+{
+    gameObject.SetActive(false); // Desactiva el objeto arquero
+    Debug.Log("Arquero ha desaparecido.");
 }
 
+
+
+
+    public void AddLife(int amount)
+    {
+        powerUpSound.Play();
+        vida = Mathf.Min(vida + amount, 6); // Asegúrate de que la vida no exceda el máximo de 6
+        uiManager.UpdateLives(vida);
+        Debug.Log("Vida aumentada. Nueva vida: " + vida);
+    }
+
+    private IEnumerator CheckNoKillPenalty()
+    {
+        while (vida > 0) // Continuar verificando mientras el arquero esté vivo
+        {
+            timeSinceLastDemonKill += Time.deltaTime;
+
+            if (timeSinceLastDemonKill >= 7f) // Si han pasado 7 segundos sin matar un Demon
+            {
+                Debug.LogWarning("El arquero no ha matado a ningún Demon en 7 segundos. Recibiendo daño.");
+                StartCoroutine(ApplyEnemyDamage()); // Aplicar daño por inactividad
+                timeSinceLastDemonKill = 0f; // Reiniciar el contador
+            }
+
+            yield return null; // Esperar al siguiente frame
+        }
+    }
+
+    public void OnDemonKilled()
+    {
+        killSound.Play(); // Reproducir sonido de matar
+        timeSinceLastDemonKill = 0f; // Reiniciar el contador
+        Debug.Log("Demon eliminado. Tiempo sin matar reiniciado.");
+    }
+
+    
+}
