@@ -23,6 +23,8 @@ public class EnemySpawner : MonoBehaviour
 
     private RandomNumberValidator randomNumberValidator = new RandomNumberValidator(); // Generador de números aleatorios validados
     [SerializeField] private GameObject specialDemonPrefab;
+    private bool specialDemonSpawned = false;
+
 
     /// <summary>
     /// Inicializa los valores del área de spawn y llena la cola de enemigos.
@@ -47,13 +49,21 @@ public class EnemySpawner : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        // Verifica si es momento de generar un nuevo enemigo y si no se ha alcanzado el límite en pantalla
+        // Verificar si el puntaje es mayor o igual a 100 y el demonio especial no ha sido generado
+        if (!specialDemonSpawned && ScoreText.scoreValue >= 100)
+        {
+            SpawnSpecialDemon();
+            specialDemonSpawned = true; // Asegurar que solo se genere una vez
+        }
+
+        // Controlar el spawn regular de enemigos
         if (Time.time >= nextSpawnTime && GetActiveEnemyCount() < maxEnemiesOnScreen)
         {
             SpawnEnemy(); // Genera un nuevo enemigo
             nextSpawnTime = Time.time + GetExponentialRandom(arrivalRate); // Programa la próxima aparición
         }
     }
+
 
     /// <summary>
     /// Genera un número aleatorio usando la distribución exponencial.
@@ -131,4 +141,25 @@ public class EnemySpawner : MonoBehaviour
             tempList.RemoveAt(randomIndex);
         }
     }
+
+    /// <summary>
+    /// Genera el demonio especial en una posición aleatoria dentro del área delimitada
+    /// y ajusta su tamaño a cinco veces el original.
+    /// </summary>
+    private void SpawnSpecialDemon()
+{
+    Vector2 position = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+    GameObject specialDemon = Instantiate(specialDemonPrefab, position, Quaternion.identity);
+    
+    // Activar el flag especial en el comportamiento del demonio
+    DemonBehavior demonBehavior = specialDemon.GetComponent<DemonBehavior>();
+    if (demonBehavior != null)
+    {
+        demonBehavior.isSpecialDemon = true;
+    }
+    
+    Debug.Log("Special demon spawned with increased size and golden color!");
+}
+
+
 }

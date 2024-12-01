@@ -16,48 +16,64 @@ public class DemonBehavior : MonoBehaviour
     private RandomNumberValidator randomNumberValidator = new RandomNumberValidator();
 
     private int score = 10; 
+    public bool isSpecialDemon = false; // Identifica si este demonio es especial
+
 
     private int currentState = 0; // Estado inicial: 0 (no generar ítem)
    
 
     void Start()
-    {
-        rb2D = GetComponent<Rigidbody2D>();
-        rb2D.gravityScale = 0;
-        animator = GetComponent<Animator>();
+{
+    rb2D = GetComponent<Rigidbody2D>();
+    rb2D.gravityScale = 0;
+    animator = GetComponent<Animator>();
 
-        if (player == null)
-        {
-            player = GameObject.FindWithTag("Player").transform;
-        }
+    if (player == null)
+    {
+        player = GameObject.FindWithTag("Player").transform;
     }
+
+    // Si es un demonio especial, ajusta su tamaño y color
+    if (isSpecialDemon)
+    {
+        GetComponent<SpriteRenderer>().color = Color.yellow; // Cambiar a dorado
+        Debug.Log("Special demon initialized with larger size and golden color.");
+    }
+}
+
 
     void Update()
+{
+    Vector3 directionToPlayer = player.position - transform.position;
+    float distanceToPlayer = directionToPlayer.magnitude;
+
+    if (distanceToPlayer <= detectionDistance)
     {
-        Vector3 directionToPlayer = player.position - transform.position;
-        float distanceToPlayer = directionToPlayer.magnitude;
+        animator.SetBool("isStopped", false);
+        Vector3 directionToMove = directionToPlayer.normalized;
 
-        if (distanceToPlayer <= detectionDistance)
+        if (directionToMove.x > 0) // Mirando a la derecha
         {
-            animator.SetBool("isStopped", false);
-            Vector3 directionToMove = directionToPlayer.normalized;
-
-            if (directionToMove.x > 0)
-            {
-                transform.localScale = new Vector3(2f, 2f, 2); // Mirando a la derecha
-            }
-            else if (directionToMove.x < 0)
-            {
-                transform.localScale = new Vector3(-2f, 2f, 2); // Mirando a la izquierda
-            }
-
-            transform.Translate(directionToMove * chaseSpeed * Time.deltaTime, Space.World);
+            transform.localScale = isSpecialDemon 
+                ? new Vector3(4f, 4f, 1f) // Demonio especial: tamaño x5 base (2f * 5 = 10f)
+                : new Vector3(2f, 2f, 2f); // Demonio normal: tamaño base
         }
-        else
+        else if (directionToMove.x < 0) // Mirando a la izquierda
         {
-            animator.SetBool("isStopped", true); // Se detiene si está fuera del rango
+            transform.localScale = isSpecialDemon 
+                ? new Vector3(-4f, 4f, 1f) // Demonio especial: tamaño x5 invertido
+                : new Vector3(-2f, 2f, 2f); // Demonio normal: tamaño base invertido
         }
+
+        // Movimiento del demonio hacia el jugador
+        transform.Translate(directionToMove * chaseSpeed * Time.deltaTime, Space.World);
     }
+    else
+    {
+        animator.SetBool("isStopped", true); // El demonio se detiene si está fuera del rango
+    }
+}
+
 
     public void TakeDamage()
     {
