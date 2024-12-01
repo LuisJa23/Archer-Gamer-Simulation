@@ -5,7 +5,7 @@ public class DemonBehavior : MonoBehaviour
 {
     public Transform player; 
     public float detectionDistance = 10f; // Distancia máxima para detectar al jugador
-    public float chaseSpeed = 0.7f; // Velocidad del demonio al perseguir
+    public float chaseSpeed = 0.1f; // Velocidad del demonio al perseguir
     public int health = 1; // Vida del demonio
     public GameObject heartPrefab; // Prefab del corazón (OneHeart)
     public GameObject speedBoostPrefab; // Prefab para el aumento de velocidad

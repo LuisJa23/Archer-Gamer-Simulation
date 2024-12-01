@@ -191,7 +191,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   detectionDistance: 10
-  chaseSpeed: 0.5
-  health: 10
+  chaseSpeed: 1.2
+  health: 4
   heartPrefab: {fileID: 2103774393423360180, guid: 7852b559d0417444184234281aff1963, type: 3}
   speedBoostPrefab: {fileID: 716079287453866446, guid: 8e517a0107c874e4ba0d59ff1490d4eb, type: 3}
+  isSpecialDemon: 0

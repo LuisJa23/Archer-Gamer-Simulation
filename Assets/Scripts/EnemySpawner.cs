@@ -2,104 +2,80 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>
-/// Controlador de generación de enemigos en un área delimitada.
-/// Permite gestionar la aparición aleatoria de enemigos dentro de un área definida
-/// y limita la cantidad de enemigos en pantalla.
-/// </summary>
 public class EnemySpawner : MonoBehaviour
 {
-    // Límites del área de aparición
     private float minX, maxX, minY, maxY;
 
-    [SerializeField] private Transform[] Spawners; // Puntos delimitadores del área de aparición
-    [SerializeField] private float arrivalRate = 0.05f; // Tasa de llegadas (lambda) para determinar intervalos de spawn
-    [SerializeField] private List<GameObject> enemyPrefabs; // Lista de prefabs de enemigos disponibles
+    [SerializeField] private Transform[] Spawners;
+    [SerializeField] private float arrivalRate = 0.05f;
+    [SerializeField] private List<GameObject> enemyPrefabs;
 
-    private Queue<GameObject> enemyQueue = new Queue<GameObject>(); // Cola de enemigos para administrar el spawn
-    private float nextSpawnTime; // Tiempo programado para la próxima aparición
+    private Queue<GameObject> enemyQueue = new Queue<GameObject>();
+    private float nextSpawnTime;
 
-    [SerializeField] private int maxEnemiesOnScreen = 5; // Número máximo de enemigos permitidos en pantalla
+    [SerializeField] private int initialMaxEnemiesOnScreen = 5; // Máximo inicial
+    private int maxEnemiesOnScreen;
+    private const int maxLimitEnemies = 10; // Máximo absoluto
+    private int previousMilestone = 0;
 
-    private RandomNumberValidator randomNumberValidator = new RandomNumberValidator(); // Generador de números aleatorios validados
     [SerializeField] private GameObject specialDemonPrefab;
-    private bool specialDemonSpawned = false;
 
+    private RandomNumberValidator randomNumberValidator = new RandomNumberValidator();
 
-    /// <summary>
-    /// Inicializa los valores del área de spawn y llena la cola de enemigos.
-    /// </summary>
     void Start()
     {
-        // Configurar límites del área basándose en las posiciones de los puntos delimitadores
         maxX = Spawners.Max(spawner => spawner.position.x);
         minX = Spawners.Min(spawner => spawner.position.x);
         maxY = Spawners.Max(spawner => spawner.position.y);
         minY = Spawners.Min(spawner => spawner.position.y);
 
-        // Llenar la cola inicial de enemigos
-        PopulateEnemyQueue();
+        maxEnemiesOnScreen = initialMaxEnemiesOnScreen;
 
-        // Calcular el tiempo para el primer spawn usando distribución exponencial
+        PopulateEnemyQueue();
         nextSpawnTime = Time.time + GetExponentialRandom(arrivalRate);
     }
 
-    /// <summary>
-    /// Método llamado cada frame. Controla el tiempo de aparición de enemigos.
-    /// </summary>
     private void Update()
     {
-        // Verificar si el puntaje es mayor o igual a 100 y el demonio especial no ha sido generado
-        if (!specialDemonSpawned && ScoreText.scoreValue >= 100)
+        int currentScore = ScoreText.scoreValue;
+
+        // Comprobar si hemos alcanzado un múltiplo de 100 para generar un demonio especial
+        if (currentScore / 100 > previousMilestone)
         {
             SpawnSpecialDemon();
-            specialDemonSpawned = true; // Asegurar que solo se genere una vez
+            previousMilestone = currentScore / 100;
+
+            // Incrementar el número máximo de enemigos en pantalla hasta un límite
+            maxEnemiesOnScreen = Mathf.Min(maxLimitEnemies, maxEnemiesOnScreen + 1);
         }
 
-        // Controlar el spawn regular de enemigos
+        // Generar enemigos regulares si no se excede el límite en pantalla
         if (Time.time >= nextSpawnTime && GetActiveEnemyCount() < maxEnemiesOnScreen)
         {
-            SpawnEnemy(); // Genera un nuevo enemigo
-            nextSpawnTime = Time.time + GetExponentialRandom(arrivalRate); // Programa la próxima aparición
+            SpawnEnemy();
+            nextSpawnTime = Time.time + GetExponentialRandom(arrivalRate);
         }
     }
 
-
-    /// <summary>
-    /// Genera un número aleatorio usando la distribución exponencial.
-    /// </summary>
-    /// <param name="lambda">Tasa de llegada (lambda) que controla la frecuencia de aparición.</param>
-    /// <returns>Un número aleatorio basado en la distribución exponencial.</returns>
     private float GetExponentialRandom(float lambda)
     {
         return -Mathf.Log((float)(1 - randomNumberValidator.GetNextNumber())) / lambda;
     }
 
-    /// <summary>
-    /// Obtiene la cantidad actual de enemigos activos en la escena.
-    /// </summary>
-    /// <returns>El número de enemigos activos.</returns>
     private int GetActiveEnemyCount()
     {
         return GameObject.FindObjectsByType<DemonBehavior>(FindObjectsSortMode.None).Length;
     }
 
-    /// <summary>
-    /// Genera un enemigo en una posición aleatoria dentro del área delimitada.
-    /// </summary>
     private void SpawnEnemy()
     {
-        // Generar una posición aleatoria dentro del área de spawn
         Vector2 position = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
 
-        // Verifica si la cola tiene enemigos disponibles
         if (enemyQueue.Count > 0)
         {
-            // Extrae el primer enemigo de la cola e instáncialo en la posición generada
             GameObject enemyPrefab = enemyQueue.Dequeue();
             Instantiate(enemyPrefab, position, Quaternion.identity);
 
-            // Si la cola está vacía después de extraer un enemigo, la rellena nuevamente
             if (enemyQueue.Count == 0)
             {
                 PopulateEnemyQueue();
@@ -107,33 +83,24 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Enemy queue is empty. No enemies spawned."); // Advertencia si la cola está vacía
+            Debug.LogWarning("Enemy queue is empty. No enemies spawned.");
         }
     }
 
-    /// <summary>
-    /// Llena la cola de enemigos utilizando los prefabs disponibles.
-    /// </summary>
     private void PopulateEnemyQueue()
     {
         foreach (var prefab in enemyPrefabs)
         {
-            enemyQueue.Enqueue(prefab); // Agrega cada prefab a la cola
+            enemyQueue.Enqueue(prefab);
         }
-
-        // Opcional: Mezcla la cola para generar aleatoriedad en el orden de aparición
         ShuffleQueue();
     }
 
-    /// <summary>
-    /// Mezcla el contenido de la cola de enemigos para hacer más impredecible su orden de aparición.
-    /// </summary>
     private void ShuffleQueue()
     {
-        List<GameObject> tempList = enemyQueue.ToList(); // Convierte la cola en una lista temporal
-        enemyQueue.Clear(); // Vacía la cola original
+        List<GameObject> tempList = enemyQueue.ToList();
+        enemyQueue.Clear();
 
-        // Mezcla aleatoriamente los elementos y los agrega nuevamente a la cola
         while (tempList.Count > 0)
         {
             int randomIndex = Random.Range(0, tempList.Count);
@@ -142,24 +109,17 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Genera el demonio especial en una posición aleatoria dentro del área delimitada
-    /// y ajusta su tamaño a cinco veces el original.
-    /// </summary>
     private void SpawnSpecialDemon()
-{
-    Vector2 position = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
-    GameObject specialDemon = Instantiate(specialDemonPrefab, position, Quaternion.identity);
-    
-    // Activar el flag especial en el comportamiento del demonio
-    DemonBehavior demonBehavior = specialDemon.GetComponent<DemonBehavior>();
-    if (demonBehavior != null)
     {
-        demonBehavior.isSpecialDemon = true;
+        Vector2 position = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+        GameObject specialDemon = Instantiate(specialDemonPrefab, position, Quaternion.identity);
+
+        DemonBehavior demonBehavior = specialDemon.GetComponent<DemonBehavior>();
+        if (demonBehavior != null)
+        {
+            demonBehavior.isSpecialDemon = true;
+        }
+
+        Debug.Log("Special demon spawned!");
     }
-    
-    Debug.Log("Special demon spawned with increased size and golden color!");
-}
-
-
 }
